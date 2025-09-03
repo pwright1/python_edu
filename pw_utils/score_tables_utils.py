@@ -10,21 +10,6 @@ need to add index creation functions
 DONT FORGET PRAGMA foreign keys in dotfile  / login
 """
 
-table_names = [
-    "applicant_biod",
-    "actstage",
-    "act_match",
-    "actfile",
-    "actrecord",
-    "act_matched_keys",
-    "act_exclude",
-    "actrecord_addl_1",
-    "actrecord_addl_2",
-    "actrecord_addl_3",
-    "actrecord_addl_4",
-    "actrecord_addl_5",
-]
-
 def applicant_biod_table_delete(conn):
     delete_q = "delete from applicant_biod"
     cur = conn.cursor()
@@ -2044,5 +2029,289 @@ def act_stage_fake_seq_table_drop(conn):
     q = "drop table if exists act_stage_fake_seq"
     cur = conn.cursor()
     cur.execute(q)
+    conn.commit()
+    return
+
+def toefl_exclude_table_drop(conn):
+    q = "drop table if exists toefl_exclude"
+    cur = conn.cursor()
+    cur.execute(q)
+    conn.commit()
+    return
+
+def toefl_exclude_table_create(conn):
+    q = """
+    create table if not exists toefl_exclude (
+    toefl_record_id integer,
+    emplid text,
+    excl_date text,
+    scc_temp_id text,
+    primary key (toefl_record_id ASC))
+    """
+    cur = conn.cursor()
+    cur.execute(q)
+    conn.commit()
+    return
+
+def toefl_matched_keys_table_drop(conn):
+    q = "drop table if exists toefl_matched_keys"
+    cur = conn.cursor()
+    cur.execute(q)
+    conn.commit()
+    return
+
+def toefl_matched_keys_table_create(conn):
+    q = """
+    create table if not exists toefl_matched_keys (
+    toefl_record_id integer,
+    siss_load_date text,
+    emplid text,
+    match_date text,
+    scc_temp_id text,
+    primary key (toefl_record_id ASC))
+    """
+    cur = conn.cursor()
+    cur.execute(q)
+    conn.commit()
+    return
+
+def toefl_file_table_drop(conn):
+    q = "drop table if exists toefl_file"
+    cur = conn.cursor()
+    cur.execute(q)
+    conn.commit()
+    return
+    
+def toefl_file_table_create(conn):
+    q = """
+    create table if not exists toefl_file(
+    toefl_file_id integer,
+    filename text,
+    loaddate text,
+    lines integer,
+    primary key(toefl_file_id ASC))
+    """
+    cur = conn.cursor()
+    cur.execute(q)
+    conn.commit()
+    return
+    
+def toefl_record_table_drop(conn):
+    q = "drop table if exists toefl_record"
+    cur = conn.cursor()
+    cur.execute(q)
+    conn.commit()
+    return
+
+def toefl_record_table_create(conn):
+    q = """
+    create table if not exists toefl_record(
+    toefl_record_id integer,
+    toefl_file_id integer,
+    fileline int,
+    icode text,
+    dcode text,
+    ran text,
+    last text,
+    first text,
+    middle text,
+    a1 text,
+    a2 text,
+    a3 text,
+    a4 text,
+    city text,
+    state text,
+    country text,
+    countryde text,
+    postal text,
+    nat_country text,
+    nat_countryde text,
+    nat_lang text,
+    nat_langde text,
+    dob text,
+    gendernum text,
+    admin_date text,
+    test_ctr_code text,
+    test_type text,
+    listen_ind text,
+    speak_ind text,
+    ibt_listening text,
+    ibt_reading text,
+    ibt_speaking text,
+    ibt_writing text,
+    ibt_total text,
+    pb_reason text,
+    pb_degree text,
+    pb_sec1 text,
+    pb_sec2 text,
+    pb_sec3 text,
+    pb_conv_twe text,
+    pb_total text,
+    pb_year text,
+    pb_times_taken text,
+    pb_nrsp_offt text,
+    email text,
+    ibt_rpdt_test_ctr_code text,
+    test_ctr_country text,
+    identification_type text,
+    id_number text,
+    id_country text,
+    rpdt_listening text,
+    rpdt_reading text,
+    rpdt_writing text,
+    dob_ex text,
+    gender_ex text,
+    mb_ibt_l text,
+    mb_ibt_ltd text,
+    mb_ibt_r text,
+    mb_ibt_rtd text,
+    mb_ibt_w text,
+    mb_ibt_wtd text,
+    mb_ibt_s text,
+    mb_ibt_std text,
+    mb_ibt_t text,
+    mb_ibt_taod text,
+    ess_l text,
+    ess_r text,
+    ess_w text,
+    ess_s text,
+    ess_tbs text,
+    ess_mb_l text,
+    ess_mb_ltd text,
+    ess_mb_r text,
+    ess_mb_rtd text,
+    ess_mb_w text,
+    ess_mb_wtd text,
+    ess_mb_s text,
+    ess_mb_std text,
+    ess_mb_tbs text,
+    ess_mb_aod text,
+    ess_cefr_l text,
+    ess_cefr_r text,
+    ess_cefr_s text,
+    ess_cefr_tbs text,
+    ess_found_sc text,
+    ess_found_vk text,
+    ess_cefr_w text,
+    canceled_dt text default '',
+    digparts text,
+    digest_nld text,
+    primary key(toefl_record_id ASC),
+    FOREIGN KEY (toefl_file_id) REFERENCES toefl_file(toefl_file_id))
+    """
+    cur = conn.cursor()
+    cur.execute(q)
+    conn.commit()
+    return
+
+def toefl_match_table_drop(conn):
+    q = "drop table if exists toefl_match"
+    cur = conn.cursor()
+    cur.execute(q)
+    conn.commit()
+    return
+
+def toefl_match_table_create(conn):
+    q = """
+    create table if not exists toefl_match (
+    ID integer,
+    toefl_record_id integer,
+    categ text,
+    trec integer,
+    emplid text,
+    ldate text,
+    AP_LAST text,
+    SUSP_LAST text,
+    AP_FIRST text,
+    AP_PREF text,
+    SUSP_FIRST text,
+    AP_MID text,
+    SMI text,
+    AX text,
+    SX text,
+    AP_DOB text,
+    SUSP_DOB text,
+    AP_MA1 text,
+    AP_HA1 text,
+    AP_SA1 text,
+    SUSP_ADDR text,
+    AP_MCITY text,
+    AP_HCITY text,
+    AP_SCITY text,
+    SUSP_CITY text,
+    AP_MSTATE text,
+    AP_HSTATE text,
+    AP_SSTATE text,
+    SUSP_STATE text,
+    AP_MPOSTAL text,
+    AP_HPOSTAL text,
+    SUSP_POSTAL text,
+    AP_MCO text,
+    AP_HCO text,
+    AP_SCO text,
+    SUSP_CO text,
+    EMAIL text,
+    MOEMAIL text,
+    FAEMAIL text,
+    SUSP_EMAIL text,
+    RAT text,
+    AE text,
+    ADR text,
+    DOB text,
+    POS text,
+    FN text,
+    EM text,
+    NPL text,
+    ANO text,
+    LN text,
+    PRIMARY KEY (ID ASC))
+    """
+    cur = conn.cursor()
+    cur.execute(q)
+    conn.commit()
+    return
+
+def toefl_stage_table_drop(conn):
+    q = "drop table if exists toefl_stage"
+    cur = conn.cursor()
+    cur.execute(q)
+    conn.commit()
+    return
+
+def toefl_stage_table_create(conn):
+    q = """
+    create table if not exists toefl_stage(
+    scc_temp_id       integer,
+    ran               text,
+    last              text,
+    first             text,
+    middle            text,
+    email             text,
+    addr1             text,
+    city              text,
+    state             text,
+    postal            text,
+    country           text,
+    dob               text,
+    status            text,
+    last_upd          text,
+    emplid            text,
+    digparts          text,
+    digest_nld        text not null unique,
+    toefl_record_id   integer,
+    query_pass        integer default 0,
+    primary key (scc_temp_id)
+    )
+    """
+
+    q2 = "create index toefl_stage_idx_digest_nld on toefl_stage(digest_nld)"
+    q3 = "create index toefl_stage_idx_query_pass on toefl_stage(query_pass)"
+    q4 = "create index toefl_stage_idx_ran on toefl_stage(ran)"
+    
+    cur = conn.cursor()
+    cur.execute(q)
+    cur.execute(q2)
+    cur.execute(q3)
+    cur.execute(q4)
     conn.commit()
     return
