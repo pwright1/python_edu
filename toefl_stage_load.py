@@ -37,11 +37,11 @@ class Bork:
         fname = sys.argv[1]
 
         if len(fname) < 27:
-            raise RuntimeError ("File name needs to have _1509_TOESTG in it to load 1")
+            raise RuntimeError ("File name needs to have _1509_TOE in it to load 1")
 
-        match_arr = re.findall(r"_1509_TOESTG",fname)
-        if len(match_arr) != 1 or match_arr[0] != "_1509_TOESTG":
-            raise RuntimeError ("File name needs to have _1509_TOESTG in it to load 2")
+        match_arr = re.findall(r"_1509_TOE",fname)
+        if len(match_arr) != 1 or match_arr[0] != "_1509_TOE":
+            raise RuntimeError ("File name needs to have _1509_TOE in it to load 2")
         
         if self.debug:
             print("the filename is {}".format(fname))

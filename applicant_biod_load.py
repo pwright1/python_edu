@@ -18,6 +18,8 @@ class Bork:
         self.index_fields = [
             "first^upper(first)",
             "fi^upper(substr(first,1,1))",
+            "li^upper(substr(last,1,1))",
+            "mi^upper(substr(middle,1,1))",
             "middle^upper(middle)",
             "appno^appno",
             "hcity^upper(hcity)",
@@ -26,15 +28,16 @@ class Bork:
             "mcity^upper(mcity)",
             "scity^upper(scity)",
             "emplid^emplid",
-            "mpostal^upper(mpostal)",
-            "hpostal^upper(hpostal)",
             "mpostal2^upper(substr(mpostal,1,5))",
             "hpostal2^upper(substr(hpostal,1,5))",
+            "mpostal^upper(mpostal)",
+            "hpostal^upper(hpostal)",
             "email^upper(email)",
             "birthdate^birthdate",
             # "phone^phone",
             "slateid^slateid",
             "orgid^length(orgid)",
+            "test_consider^test_consider",
             ]
         pass
 
@@ -45,7 +48,8 @@ class Bork:
             #print(index_q)
             cur = conn.cursor()
             cur.execute(index_q)
-    
+            conn.commit()
+            
     def drop_index(self, conn):
         for field in self.index_fields:
             fname, fname2 = field.split("^")
@@ -53,7 +57,8 @@ class Bork:
             #print(index_q)
             cur = conn.cursor()
             cur.execute(index_q)
-    
+            conn.commit()
+            
     def insert(self, conn, tup):
         insert_q = """
         insert into applicant_biod (SLATEID, EMPLID, APPNO, NPLAN, ADMITTYPE, ADMITTERM, FIRST, MIDDLE, LAST, PREFNAME, SUFFIX, SEX, BIRTHDATE, EMAIL, FATHEREMAIL, MOTHEREMAIL, CELLPHONE, HOMEPHONE, FATHERPHONE, MOTHERPHONE, MADDRESS1, MADDRESS2, MADDRESS3, MADDRESS4, MCITY, MSTATE, MPOSTAL, MCOUNTRY, MCOUNTRYDE, HADDRESS1, HADDRESS2, HADDRESS3, HADDRESS4, HCITY, HSTATE, HPOSTAL, HCOUNTRY, HCOUNTRYDE, SNAME, SADDRESS1, SADDRESS2, SCITY, SSTATE, SPOSTAL, SCOUNTRY, ORGID, CEEB) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)

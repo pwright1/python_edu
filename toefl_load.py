@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Copyright Aug 2025, Philip Wright. All rights reserved. 
+# Copyright Sep 2025, Philip Wright. All rights reserved. 
 
 import sys
 import traceback
@@ -95,7 +95,8 @@ class Bork:
                     line_count += 1
             self.toefl_file_update_lines(conn, toefl_file_id, line_count-1)
             # one commit per file completion
-            conn.commit()
+            if os.environ.get("TOE_NO_COMMIT", None) == None:
+                conn.commit()
         pass # def go
     pass # class Bork
         

@@ -6,6 +6,7 @@ import sys
 import traceback
 import sqlite3
 import os.path
+import os
 import time
 from datetime import datetime
 from pw_utils import mydb_utils
@@ -507,7 +508,8 @@ class Bork:
                         print(line_count)
                     line_count += 1
             self.sat_file_update_lines(conn, satfile_id, line_count-1)
-            conn.commit()
+            if os.environ.get("SAT_NO_COMMIT", None) == None:
+                conn.commit()
         pass # def go
 
     #------------------
@@ -561,7 +563,3 @@ def main():
         pass
 
 main()
-
-
-q = """
-"""

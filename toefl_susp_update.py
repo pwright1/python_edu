@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Copyright Aug 2025, Philip Wright. All rights reserved. 
+# Copyright Sep 2025, Philip Wright. All rights reserved.
 
 import sys
 import traceback
@@ -18,21 +18,21 @@ class Bork:
     def __init__(self):
         self.script_dir = mydb_utils.get_python_script_dir()
         
-    def keys_insert(self, conn, actrecord_id, siss_load_date, emplid, match_date, trec):
+    def keys_insert(self, conn, toeflrecord_id, siss_load_date, emplid, match_date, trec):
         q = """
-        insert into act_matched_keys (actrecord_id, siss_load_date, emplid, match_date, scc_temp_id) 
+        insert into toefl_matched_keys (toefl record_id, siss_load_date, emplid, match_date, scc_temp_id) 
         values (?,?,?,?,?)
-        on conflict do nothing
         """
         cur = conn.cursor()
-        cur.execute(q, (actrecord_id, siss_load_date, emplid, match_date, trec))
+        cur.execute(q, (toeflrecord_id, siss_load_date, emplid, match_date, trec))
         
     def go(self, conn):
-        if not (len(sys.argv[1:]) == 1 and sys.argv[1] == "act_ready.csv_plain.csv"):
-            raise RuntimeError("use: python act_susp_update.py act_ready.csv_plain.csv")
+        if not (len(sys.argv[1:]) == 1 and sys.argv[1] == "toefl_ready.csv_plain.csv"):
+            raise RuntimeError("use: python toefl_susp_update.py toefl_ready.csv_plain.csv")
         ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         inname = sys.argv[1]
-        outname = "act_stage.txt"
+        outname = "toefl_stage.txt"
+        expected_fields = 69
         with open(outname, "w") as fout:
             with open(inname, "r") as fin:
                 line_count = 1
@@ -54,13 +54,21 @@ class Bork:
                     line = line.strip()
                     # should do encoding check / fix here if not valid utf-8
                     fields = mydb_utils.split_sq_csv_line(line)
+                    if len(fields) != expected_fields:
+                        print(f"unexpected field count {len(fields)} not expected value {expected_fields}")
+                    
+                    ahid, trec, emplid, ap_last, susp_last, ap_first, ap_pref, susp_first, ap_mid, smi, ax, sx, ap_dob, susp_dob, ap_ma1, ap_ha1, ap_sa1, susp_addr, susp_addr2, susp_addr3, susp_addr4, ap_mcity, ap_hcity, ap_scity, susp_city, ap_mstate, ap_hstate, ap_sstate, susp_state, ap_mpostal, ap_hpostal, susp_postal, ap_mco, ap_hco, ap_sco, susp_co, email, moemail, faemail, susp_email, rat, ae, adr, dob, pos, fn, em, npl, ano, ln, tdate, ttype, ibt_list, ibt_read, ibt_spea, ibt_writ, ibt_tot, pb_sec1, pb_sec2, pb_sec3, pb_conv_twe, pb_total, rpdt_list, rpdt_read, rpdt_writ, ran, filename, line = fields
+                    
+                    if ahid == "" or ldate == "" or emplid == "" or ts == "" or trec == "":
+                        mydb_utils.uga_out(sys.stdout,
+                                           ["keys ins err:",ahid, ldate, emplid, ts, trec])
+                        raise RuntimeError("blank keys insert value")
 
-                    ahid,trec,emplid,ldate,actid,ap_last,susp_last,ap_first,ap_pref,susp_first,ap_mid,smi,ax,sx,ap_dob,susp_dob,ap_ma1,ap_ha1,ap_sa1,susp_addr,ap_mcity,ap_hcity,ap_scity,susp_city,ap_mstate,ap_hstate,ap_sstate,susp_state,ap_mpostal,ap_hpostal,susp_postal,ap_mco,ap_hco,ap_sco,susp_co,hphone,cphone,mophone,faphone,susp_phone,email,moemail,faemail,susp_email,ap_atp,susp_atp,rat,ape,adr,dob,pho,atp,pos,fn,em,npl,ano,ln,fdup = fields
-                
                     self.keys_insert(conn, ahid, ldate, emplid, ts, trec)
-                    mydb_utils.uga_out_noquote(fout, ["DU_ACT_TEST_TRANSACTION", trec, emplid])
-                    if line_count % 10 == 0:
-                        conn.commit()
+                    mydb_utils.uga_out_noquote(fout, ["DU_TOEFL_TEST_TRANSACTION", trec, emplid])
+                    #if line_count % 10 == 0:
+                    #    conn.commit()
+                    line_count += 1
                 conn.commit()
         
 def main():

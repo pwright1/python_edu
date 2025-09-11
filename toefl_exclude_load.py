@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Copyright Aug 2025, Philip Wright. All rights reserved.
+# Copyright Sep 2025, Philip Wright. All rights reserved.
 
 import sys
 import traceback
@@ -18,17 +18,16 @@ class Bork:
     def __init__(self):
         self.script_dir = mydb_utils.get_python_script_dir()
         
-    def exclude_insert(self, conn, satrecord_id, siss_id, emplid, excldate):
+    def exclude_insert(self, conn, toeflrecord_id, scc_temp_id, emplid, excldate):
         q = """
-        insert into sat_exclude (satrecord_id, siss_id, emplid, excldate) values (?,?,?,?)
-        on conflict do nothing
+        insert into toefl_exclude (toefl_record_id, scc_temp_id, emplid, excl_date) values (?,?,?,?)
         """
         cur = conn.cursor()
-        cur.execute(q, (satrecord_id, siss_id, emplid, excldate))
+        cur.execute(q, (toeflrecord_id, scc_temp_id, emplid, excldate))
         
     def go(self, conn):
-        if not (len(sys.argv[1:]) == 1 and sys.argv[1] == "sat_excl.csv_plain.csv"):
-            raise RuntimeError("use: python sat_exclude_load.py sat_excl.csv_plain.csv")
+        if not (len(sys.argv[1:]) == 1 and sys.argv[1] == "toefl_excl.csv_plain.csv"):
+            raise RuntimeError("use: python toefl_exclude_load.py toefl_excl.csv_plain.csv")
         ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         inname = sys.argv[1]
         expected_fields = 59
@@ -54,14 +53,15 @@ class Bork:
 
                 if len(fields) != expected_fields:
                     print(f"unexpected field count {len(fields)} not expected value {expected_fields}")
-                ahid, trec, emplid, ldate, ap_last, susp_last, ap_first, ap_pref, susp_first, ap_mid, smi, ax, sx, ap_dob, susp_dob, ap_ma1, ap_ha1, ap_sa1, susp_addr, ap_mcity, ap_hcity, ap_scity, susp_city, ap_mstate, ap_hstate, ap_sstate, susp_state, ap_mpostal, ap_hpostal, susp_postal, ap_mco, ap_hco, ap_sco, susp_co, ap_ceeb, susp_ceeb, ap_sname, susp_sname, hphone, cphone, mophone, faphone, susp_phone, email, moemail, faemail, susp_email, rat, ape, adr, dob, pho, ceeb, pos, fn, em, npl, ano, ln = fields
+                # prune this to correct values, these were from act or sat
+                #ahid, scc_temp_id, emplid, ldate, ap_last, susp_last, ap_first, ap_pref, susp_first, ap_mid, smi, ax, sx, ap_dob, susp_dob, ap_ma1, ap_ha1, ap_sa1, susp_addr, ap_mcity, ap_hcity, ap_scity, susp_city, ap_mstate, ap_hstate, ap_sstate, susp_state, ap_mpostal, ap_hpostal, susp_postal, ap_mco, ap_hco, ap_sco, susp_co, ap_ceeb, susp_ceeb, ap_sname, susp_sname, hphone, cphone, mophone, faphone, susp_phone, email, moemail, faemail, susp_email, rat, ape, adr, dob, pho, ceeb, pos, fn, em, npl, ano, ln = fields
                     
-                if ahid == "" or emplid == "" or ts == "" or trec == "":
+                if ahid == "" or emplid == "" or ts == "" or scc_temp_id == "":
                     mydb_utils.uga_out(sys.stdout,
-                                       ["keys ins err:",ahid, emplid, ts, trec])
+                                       ["keys ins err:",ahid, emplid, ts, scc_temp_id])
                     raise RuntimeError("blank keys insert value")
                 
-                self.exclude_insert(conn, ahid, trec, emplid, ts)
+                self.exclude_insert(conn, ahid, scc_temp_id, emplid, ts)
                 #if line_count % 10 == 0:
                 # conn.commit()
                 line_count += 1

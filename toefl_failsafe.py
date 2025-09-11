@@ -11,11 +11,11 @@ from pw_utils import mydb_utils
 from pw_utils import string_utils
 
 note = """
-  reads from sat_ready.csv
-  reformats it to sat_ready.csv_plain.csv
-  looks up the sat record in the local database
+  reads from toefl_ready.csv
+  reformats it to toefl_ready.csv_plain.csv
+  looks up the toefl record in the local database
   looks up the applicant record in applicant_biod
-  any issues get written to sat_mismatch.xlsx
+  any issues get written to toefl_mismatch.xlsx
 """
 
 class Bork:
@@ -39,16 +39,16 @@ class Bork:
         return [last, first, middle, birthdate, sex, prefname]
 
     #----------------------------------
-    def lu_sat(self, conn, satrecord_id):
-        if satrecord_id == "":
+    def lu_toefl(self, conn, toeflrecord_id):
+        if toeflrecord_id == "":
             return ["","","","",""]
-        sat_lu_q = """
+        toefl_lu_q = """
         select last, first, mi, dob, sex
-        from satrecord where satrecord_id = ?
+        from toefl_record where toefl_record_id = ?
         """
         last, first, mi, dob, sex = ["","","","",""]
         cur = conn.cursor()
-        for row in cur.execute(sat_lu_q, (satrecord_id,)):
+        for row in cur.execute(toefl_lu_q, (toeflrecord_id,)):
             last, first, mi, dob, sex = row
         cur.close
 
@@ -60,27 +60,27 @@ class Bork:
         
     #----------------------------------
     def read_file(self,conn):
-        if not os.path.exists("sat_ready.csv"):
-            raise Exception("missing file sat_ready.csv")
+        if not os.path.exists("toefl_ready.csv"):
+            raise Exception("missing file toefl_ready.csv")
 
-        if not os.path.exists("sat_excl.csv"):
-            raise Exception("missing file sat_excl.csv")
+        if not os.path.exists("toefl_excl.csv"):
+            raise Exception("missing file toefl_excl.csv")
 
-        cmd = f"{self.py} " + os.path.join(self.script_dir, "excel_csv_to_plain_csv.py sat_ready.csv")
+        cmd = f"{self.py} " + os.path.join(self.script_dir, "excel_csv_to_plain_csv.py toefl_ready.csv")
         os.system(cmd)
 
-        cmd = f"{self.py} " + os.path.join(self.script_dir, "excel_csv_to_plain_csv.py sat_excl.csv")
+        cmd = f"{self.py} " + os.path.join(self.script_dir, "excel_csv_to_plain_csv.py toefl_excl.csv")
         os.system(cmd)
 
-        satrecord_id_hash = {}
-        out_csv = "sat_mismatch.csv"
-        hdr = string_utils.pct_w("COUNT_ SATRECORD_ID_ SCC_TEMP_ID_ EMPLID_ BLN_ BMI_ BFN_ BDOB_ SLAST_ ALAST_ SFIRST_ AFIRST_ APREF_ SMI_ AMIDDLE_ SDOB_ ADOB_")
+        toeflrecord_id_hash = {}
+        out_csv = "toefl_mismatch.csv"
+        hdr = string_utils.pct_w("COUNT_ TOEFL_RECORD_ID_ SCC_TEMP_ID_ EMPLID_ BLN_ BMI_ BFN_ BDOB_ SLAST_ ALAST_ SFIRST_ AFIRST_ APREF_ SMI_ AMIDDLE_ SDOB_ ADOB_")
         with open(out_csv, "w") as fout:
             mydb_utils.uga_out(fout,hdr)
-            # read sat_ready.csv_plain.csv
-            with open("sat_ready.csv_plain.csv", "r") as fin:
+            # read toefl_ready.csv_plain.csv
+            with open("toefl_ready.csv_plain.csv", "r") as fin:
                 readfile_done = False
-                read_expected_fields = 59
+                read_expected_fields = 69
                 read_linecount = 0
                 while not readfile_done:
                     line = fin.readline()
@@ -96,13 +96,13 @@ class Bork:
                     nfields = len(fields)
                     if nfields != read_expected_fields:
                         raise RuntimeError(f"line {read_linecount+1} fields {nfields} not expected {read_expected_fields}")
-                    ahid, trec, emplid, ldate, ap_last, susp_last, ap_first, ap_pref, susp_first, ap_mid, smi, ax, sx, ap_dob, susp_dob, ap_ma1, ap_ha1, ap_sa1, susp_addr, ap_mcity, ap_hcity, ap_scity, susp_city, ap_mstate, ap_hstate, ap_sstate, susp_state, ap_mpostal, ap_hpostal, susp_postal, ap_mco, ap_hco, ap_sco, susp_co, ap_atp, susp_atp, ap_sname, susp_sname, hphone, cphone, mophone, faphone, susp_phone, email, moemail, faemail, susp_email, rat, ape, adr, dob, pho, atp, pos, fn, em, npl, ano, ln  = fields
-                    if not satrecord_id_hash.get(ahid, None) is None:
-                        raise RuntimeError(f"dup use of satreacord_id: {ahid} emplid: {emplid} prev emplid {emplid} lineno: {read_linecount+1}")
+                    ahid, trec, emplid, ap_last, susp_last, ap_first, ap_pref, susp_first, ap_mid, smi, ax, sx, ap_dob, susp_dob, ap_ma1, ap_ha1, ap_sa1, susp_addr, susp_addr2, susp_addr3, susp_addr4, ap_mcity, ap_hcity, ap_scity, susp_city, ap_mstate, ap_hstate, ap_sstate, susp_state, ap_mpostal, ap_hpostal, susp_postal, ap_mco, ap_hco, ap_sco, susp_co, email, moemail, faemail, susp_email, rat, ae, adr, dob, pos, fn, em, npl, ano, ln, tdate, ttype, ibt_list, ibt_read, ibt_spea, ibt_writ, ibt_tot, pb_sec1, pb_sec2, pb_sec3, pb_conv_twe, pb_total, rpdt_list, rpdt_read, rpdt_writ, ran, filename, line = fields
+                    if not toeflrecord_id_hash.get(ahid, None) is None:
+                        raise RuntimeError(f"dup use of toeflreacord_id: {ahid} emplid: {emplid} prev emplid {emplid} lineno: {read_linecount+1}")
                     else:
-                        satrecord_id_hash[ahid] = emplid
+                        toeflrecord_id_hash[ahid] = emplid
                     alast, afirst, amiddle, adob, asex, aprefname = self.lu_applicant_biod(conn, emplid)
-                    slast,sfirst,smi,sdob,ssex = self.lu_sat(conn, ahid)
+                    slast,sfirst,smi,sdob,ssex = self.lu_toefl(conn, ahid)
                     
                     
                     ami = ""

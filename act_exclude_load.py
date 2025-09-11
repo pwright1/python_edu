@@ -21,6 +21,7 @@ class Bork:
     def exclude_insert(self, conn, actrecord_id, siss_id, emplid, excldate):
         q = """
         insert into act_exclude (actrecord_id, siss_id, emplid, excldate) values (?,?,?,?)
+        on conflict do nothing
         """
         cur = conn.cursor()
         cur.execute(q, (actrecord_id, siss_id, emplid, excldate))

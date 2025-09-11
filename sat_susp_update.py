@@ -22,6 +22,7 @@ class Bork:
         q = """
         insert into sat_matched_keys (satrecord_id, siss_load_date, emplid, match_date, scc_temp_id) 
         values (?,?,?,?,?)
+        on conflict do nothing
         """
         cur = conn.cursor()
         cur.execute(q, (satrecord_id, siss_load_date, emplid, match_date, trec))

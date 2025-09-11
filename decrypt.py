@@ -22,6 +22,7 @@ class Bork:
         the_pass = getpass.getpass("password:")
         args = mydb_utils.get_glob_args()
         for filename in args:
+            print(filename)
             result = encryption.gpg_decrypt(filename, the_pass)
             print(result)
     

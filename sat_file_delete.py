@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Copyright Aug 2025, Philip Wright. All rights reserved. 
+# Copyright Sep 2025, Philip Wright. All rights reserved. 
 
 import sys
 import os
@@ -8,7 +8,7 @@ import traceback
 import sqlite3
 from pw_utils import mydb_utils
 from pw_utils import string_utils
-from pw_utils import act_utils
+from pw_utils import sat_utils
 
 class Bork:
     debug = False
@@ -17,18 +17,18 @@ class Bork:
 
     def go(self, conn):
         if len(sys.argv[1:]) == 0:
-            print("use python act_file_delete.py actfile_id")
+            print("use python sat_file_delete.py satfile_id")
             sys.exit()
-        actfile_id = sys.argv[1]
-        type, int_val = string_utils.mytype(actfile_id)
+        satfile_id = sys.argv[1]
+        type, int_val = string_utils.mytype(satfile_id)
         if type != "int":
-            printf(f"non integer id: {actfile_id} ignored")
+            printf(f"non integer id: {satfile_id} ignored")
         else:
             print("Are you sure? Answer Yes")
             response = input()
             if response.lower() == "yes":
                 print("doing delete")
-                act_utils.delete_act_file(conn, int_val)
+                sat_utils.delete_sat_file(conn, int_val)
                 conn.commit()
 
 def main():

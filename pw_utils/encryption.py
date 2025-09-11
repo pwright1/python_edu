@@ -45,6 +45,7 @@ def gpg_decrypt(efilename, the_pass):
     args.append("0")
     args.append("--pinentry-mode")
     args.append("loopback")
+    args.append("--decrypt")
     args.append(efilename)
     
     result = subprocess.run(args,check=False, timeout=30,input=the_pass,text=True,encoding='utf-8',capture_output=True)
