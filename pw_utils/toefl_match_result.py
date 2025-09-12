@@ -44,7 +44,8 @@ class ToeflMatchResult:
         
         self.set_vals(bsusp.id1,
                       bsusp.id2,
-                      ahome.id1,
+                      #ahome.id1, #slate id
+                      ahome.id2, # emplid
                       ahome.last,
                       bsusp.last,
                       ahome.first,

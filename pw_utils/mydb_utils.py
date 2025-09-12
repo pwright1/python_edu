@@ -4,7 +4,8 @@
 import sys
 import os
 import platform
-from datetime import datetime
+from datetime import datetime, timezone
+
 from pw_utils import string_utils
 from pw_utils import mydb_utils
 import sqlite3
@@ -112,6 +113,10 @@ def get_ays_ts():
     tstamp = datetime.now().strftime("%m/%d/%Y")
     return tstamp
 
+def get_utc_ts():
+    tstamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")
+    return tstamp
+
 def uga_out(fh, arr):
     errors = 0
     msg = ""
@@ -191,6 +196,12 @@ def psdate_to_iso(date):
     mm = date[4:6]
     dd = date[6:8]
     return f"{yyyy}-{mm}-{dd}"
+
+def psdate_to_date(date):
+    yyyy = date[0:4]
+    mm = date[4:6]
+    dd = date[6:8]
+    return f"{mm}/{dd}/{yyyy}"
 
 def date_to_iso(date):
     mm = date[0:2]

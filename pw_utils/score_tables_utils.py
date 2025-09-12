@@ -2046,7 +2046,7 @@ def toefl_exclude_table_create(conn):
     emplid text,
     excl_date text,
     scc_temp_id text,
-    primary key (toefl_record_id ASC))
+    primary key (toefl_record_id, emplid))
     """
     cur = conn.cursor()
     cur.execute(q)
@@ -2068,7 +2068,7 @@ def toefl_matched_keys_table_create(conn):
     emplid text,
     match_date text,
     scc_temp_id text,
-    primary key (toefl_record_id ASC))
+    primary key (toefl_record_id, emplid))
     """
     cur = conn.cursor()
     cur.execute(q)
@@ -2336,3 +2336,25 @@ def toefl_stage_table_create(conn):
     cur.execute(q4)
     conn.commit()
     return
+
+
+def slate_country_table_drop(conn):
+    q = "drop table if exists slate_country"
+    cur = conn.cursor()
+    cur.execute(q)
+    conn.commit()
+    return
+
+def slate_country_table_create(conn):
+    q = """
+    create table if not exists slate_country (
+    country text,
+    country3 text,
+    primary key(country))
+    """
+    cur = conn.cursor()
+    cur.execute(q)
+    conn.commit()
+    return
+
+

@@ -29,13 +29,19 @@ class Bork:
     def lu_applicant_biod(self, conn, emplid):
         q = """
         select last, first, middle, birthdate, sex, prefname
-        from applicant_biod where emplid = ? limit 1
+        from applicant_biod where emplid = ?
+        limit 1
         """
+        count = 0
         cur = conn.cursor()
         last, first, middle, birthdate, sex, prefname = ["","","","","",""]
         for row in cur.execute(q, (emplid,)):
             last, first, middle, birthdate, sex, prefname = row
+            count += 1
         cur.close
+        if count == 0:
+            print(f"zero count lu_applicant for emplid {emplid}")
+
         return [last, first, middle, birthdate, sex, prefname]
 
     #----------------------------------
@@ -43,20 +49,21 @@ class Bork:
         if toeflrecord_id == "":
             return ["","","","",""]
         toefl_lu_q = """
-        select last, first, mi, dob, sex
+        select last, first, middle, dob, gender_ex
         from toefl_record where toefl_record_id = ?
         """
-        last, first, mi, dob, sex = ["","","","",""]
+        last, first, middle, dob, sex = ["","","","",""]
         cur = conn.cursor()
         for row in cur.execute(toefl_lu_q, (toeflrecord_id,)):
-            last, first, mi, dob, sex = row
+            last, first, middle, dob, sex = row
         cur.close
 
         vdob = ""
         if len(dob) > 0:
-            vdob = mydb_utils.iso_to_date(dob)
+            vdob = mydb_utils.psdate_to_date(dob)
         
-        return [last, first, mi, vdob, sex]
+        #print(vdob)    
+        return [last, first, middle[0:1], vdob, sex]
         
     #----------------------------------
     def read_file(self,conn):
@@ -96,7 +103,7 @@ class Bork:
                     nfields = len(fields)
                     if nfields != read_expected_fields:
                         raise RuntimeError(f"line {read_linecount+1} fields {nfields} not expected {read_expected_fields}")
-                    ahid, trec, emplid, ap_last, susp_last, ap_first, ap_pref, susp_first, ap_mid, smi, ax, sx, ap_dob, susp_dob, ap_ma1, ap_ha1, ap_sa1, susp_addr, susp_addr2, susp_addr3, susp_addr4, ap_mcity, ap_hcity, ap_scity, susp_city, ap_mstate, ap_hstate, ap_sstate, susp_state, ap_mpostal, ap_hpostal, susp_postal, ap_mco, ap_hco, ap_sco, susp_co, email, moemail, faemail, susp_email, rat, ae, adr, dob, pos, fn, em, npl, ano, ln, tdate, ttype, ibt_list, ibt_read, ibt_spea, ibt_writ, ibt_tot, pb_sec1, pb_sec2, pb_sec3, pb_conv_twe, pb_total, rpdt_list, rpdt_read, rpdt_writ, ran, filename, line = fields
+                    ahid, trec, emplid, ap_last, susp_last, ap_first, ap_pref, susp_first, ap_mid, smi, ax, sx, ap_dob, susp_dob, ap_ma1, ap_ha1, ap_sa1, susp_addr, susp_addr2, susp_addr3, susp_addr4, ap_mcity, ap_hcity, ap_scity, susp_city, ap_mstate, ap_hstate, ap_sstate, susp_state, ap_mpostal, ap_hpostal, susp_postal, ap_mco, ap_hco, ap_sco, susp_co, email, moemail, faemail, susp_email, rat, ae, adr, dob, pos, fn, em, pem, npl, ano, ln, tdate, ttype, ibt_list, ibt_read, ibt_spea, ibt_writ, ibt_tot, pb_sec1, pb_sec2, pb_sec3, pb_conv_twe, pb_total, rpdt_list, rpdt_read, rpdt_writ, ran, filename, line = fields
                     if not toeflrecord_id_hash.get(ahid, None) is None:
                         raise RuntimeError(f"dup use of toeflreacord_id: {ahid} emplid: {emplid} prev emplid {emplid} lineno: {read_linecount+1}")
                     else:
